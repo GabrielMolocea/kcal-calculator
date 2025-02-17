@@ -1,13 +1,14 @@
-DROP TABLE IF EXISTS kcal_calculator;
-CREATE TABLE kcal_calculator (
-  id         INT AUTO_INCREMENT NOT NULL,
-  name       VARCHAR(128) NOT NULL,
-  calories   INT NOT NULL,
-  PRIMARY KEY (`id`)
+CREATE DATABASE IF NOT EXISTS kcal_calculator;
+
+USE kcal_calculator;
+
+CREATE TABLE IF NOT EXISTS foods (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    calories INT NOT NULL
 );
 
-INSERT INTO kcal_calculator
-  (name, calories)
+INSERT INTO foods (name, calories)
 VALUES 
     ('Apple', 52),
     ('Banana', 89),
@@ -109,10 +110,10 @@ VALUES
     ('Sea Buckthorn', 82),
     ('Acai Berry', 70),
     ('Maqui Berry', 65),
-    ('Chiken brest', 164),
-    ('Chiken thigh', 209),
-    ('Chiken drumstick', 119),
-    ('Chiken wing', 42),
+    ('Chicken breast', 164),
+    ('Chicken thigh', 209),
+    ('Chicken drumstick', 119),
+    ('Chicken wing', 42),
     ('Turkey breast', 135),
     ('Turkey thigh', 161),
     ('Turkey drumstick', 119),
@@ -162,4 +163,4 @@ VALUES
     ('Venison shoulder', 212),
     ('Venison leg', 242),
     ('Rabbit loin', 143),
-    ('Rabbit ribs', 172),
+    ('Rabbit ribs', 172);

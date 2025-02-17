@@ -1,0 +1,66 @@
+<!-- filepath: /c:/Users/gabri/Desktop/GO/kcal-calculator/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie Calculator</title>
+</head>
+<body>
+    <h1>Calorie Calculator</h1>
+    <h2>Foods</h2>
+    <ul id="food-list"></ul>
+
+    <h2>Add Food</h2>
+    <form id="food-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="calories">Calories:</label>
+        <input type="number" id="calories" name="calories" required>
+        <button type="submit">Add Food</button>
+    </form>
+
+    <script>
+        // Function to fetch and display foods
+        async function fetchFoods() {
+            const response = await fetch('http://localhost:8080/foods');
+            const foods = await response.json();
+            const foodList = document.getElementById('food-list');
+            foodList.innerHTML = '';
+            foods.forEach(food => {
+                const li = document.createElement('li');
+                li.textContent = `${food.name} - ${food.calories} calories`;
+                foodList.appendChild(li);
+            });
+        }
+
+        // Function to add a new food
+        async function addFood(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const calories = document.getElementById('calories').value;
+
+            const response = await fetch('http://localhost:8080/newfood', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, calories })
+            });
+
+            if (response.ok) {
+                fetchFoods();
+                document.getElementById('food-form').reset();
+            } else {
+                alert('Failed to add food');
+            }
+        }
+
+        // Fetch foods when the page loads
+        document.addEventListener('DOMContentLoaded', fetchFoods);
+
+        // Add event listener to the form
+        document.getElementById('food-form').addEventListener('submit', addFood);
+    </script>
+</body>
+</html>
