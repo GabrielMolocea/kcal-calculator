@@ -38,9 +38,26 @@
                 alert('Failed to add food');
             }
         }
+
+        // Function to get target calories
+        async function getTargetCalories() {
+            try {
+                const response = await fetch('http://localhost:8080/targetkcal');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const targetKcal = await response.json();
+                const targetElement = document.getElementById('target');
+                targetElement.textContent = `Target Calories: ${targetKcal.targetKcal}`;
+            } catch (error) {
+                console.error('Error fetching target calories:', error);
+            }
+        }
         
         // Fetch foods when the page loads
-        document.addEventListener('DOMContentLoaded', fetchFoods);
+        document.addEventListener('DOMContentLoaded', () => {
+            getTargetCalories();
+            fetchFoods()});
         
         // Add event listener to the form
         document.getElementById('food-form').addEventListener('submit', addFood);
