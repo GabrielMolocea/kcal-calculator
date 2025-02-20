@@ -101,13 +101,11 @@ func postTargetKcal(c *gin.Context) {
 
 func postFoods(c *gin.Context) {
 	var newFood Food
-
 	if err := c.BindJSON(&newFood); err != nil {
-		log.Printf("Error binding JSON: %v", err)
+		log.Panicf("Error binding JSON: %v", err)
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-
 	result, err := db.Exec("INSERT INTO foods (name, calories) VALUES (?, ?)", newFood.Name, newFood.Calories)
 	if err != nil {
 		log.Printf("Error inserting into database: %v", err)
@@ -121,9 +119,40 @@ func postFoods(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-
 	newFood.ID = id
+
+	var targetKcal TargetKcal
+	row := db.QueryRow("SELECT id, targetKcal FROM targetKcal ORDER BY id DESC LIMIT 1")
+	if err := row.Scan(&targetKcal.ID, &targetKcal.TargetKcal); err != nil {
+		if err == sql.ErrNoRows {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"message": "No target calories found"})
+		} else {
+			log.Printf("Error scanning row: %v", err)
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		}
+		return
+	}
+
+	newTargetKcal := targetKcal.TargetKcal - newFood.Calories
+	_, err = db.Exec("UPDATE targetKcal SET targetKcal = ? WHERE id = ?", newTargetKcal, targetKcal.ID)
+	if err != nil {
+		log.Printf("Error updating target calories: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
 	c.IndentedJSON(http.StatusCreated, newFood)
+}
+
+func restTargetKcal(c *gin.Context) {
+	// Rest to target of 1000
+	_, err := db.Exec("UPDATE targetKcal SET targetKcal = 1000")
+	if err != nil {
+		log.Printf("Error updating target calories: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"target": err.Error()})
+		return
+
+	}
+	c.IndentedJSON(http.StatusOK, gin.H{"message": 1000})
 }
 
 // func runSQLScript(db *sql.DB, filePath string) error {
@@ -182,6 +211,7 @@ func main() {
 	router.GET("/targetkcal", getTargetKcal)
 	router.POST("/newfood", postFoods)
 	router.POST("/targetkcal", postTargetKcal)
+	router.POST("/resttargetkcal", restTargetKcal)
 
 	router.Run("localhost:8080") // Change the port number here
 }
