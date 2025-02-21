@@ -155,19 +155,19 @@ func restTargetKcal(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": 1000})
 }
 
-// func runSQLScript(db *sql.DB, filePath string) error {
-//     script, err := os.ReadFile(filePath)
-//     if err != nil {
-//         return fmt.Errorf("error reading SQL file: %v", err)
-//     }
+ func runSQLScript(db *sql.DB, filePath string) error {
+     script, err := os.ReadFile(filePath)
+     if err != nil {
+         return fmt.Errorf("error reading SQL file: %v", err)
+     }
 
-//     _, err = db.Exec(string(script))
-//     if err != nil {
-//         return fmt.Errorf("error executing SQL script: %v", err)
-//     }
+     _, err = db.Exec(string(script))
+     if err != nil {
+         return fmt.Errorf("error executing SQL script: %v", err)
+     }
 
-//     return nil
-// }
+     return nil
+ }
 
 func main() {
 	// Load environment variables from .env file
