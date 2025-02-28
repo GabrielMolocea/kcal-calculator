@@ -1,7 +1,12 @@
 import { useState, useCallback } from "react";
 import { Search, Plus } from "lucide-react";
 
-const CaloriesForm = ({ setTotalKcal, foodList }) => {
+interface CaloriesFormProps {
+	setTotalKcal: (kcal: number) => void;
+	foodList: { name: string; calories: number }[];
+}
+
+const CaloriesForm: React.FC<CaloriesFormProps> = ({ setTotalKcal, foodList }) => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selectedFood, setSelectedFood] = useState<{
 		name: string;
@@ -24,12 +29,13 @@ const CaloriesForm = ({ setTotalKcal, foodList }) => {
 			setSelectedFood(food);
 			setSearchTerm(food.name);
 			setIsListVisible(false);
+			setTotalKcal(food.calories);
 		},
 		[]
 	);
 
 	const filteredFoods = foodList
-		.filter((food) => food.name.toLowerCase().includes(searchTerm.toLowerCase()))
+		.filter((food: { name: string; }) => food.name.toLowerCase().includes(searchTerm.toLowerCase()))
 		.slice(0, 10);
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -137,7 +143,7 @@ const CaloriesForm = ({ setTotalKcal, foodList }) => {
 							{isListVisible && searchTerm && (
 								<ul className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
 									{filteredFoods.length > 0 ? (
-										filteredFoods.map((food) => (
+										filteredFoods.map((food: { id?: any; name: any; calories: any; }) => (
 											<ul
 												key={food.id}
 												onClick={() => handleFoodSelect(food)}

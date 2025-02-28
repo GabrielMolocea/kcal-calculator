@@ -46,7 +46,15 @@ func PostTargetKcal(c *gin.Context) {
 }
 
 func RestTargetKcal(c *gin.Context) {
-    _, err := database.DB.Exec("UPDATE targetKcal SET targetKcal = 0 WHERE id = (SELECT id FROM targetKcal ORDER BY id DESC LIMIT 1)")
+    var id int
+    err := database.DB.QueryRow("SELECT id FROM targetKcal ORDER BY id DESC LIMIT 1").Scan(&id)
+    if err != nil {
+        log.Printf("Error selecting target calories ID: %v", err)
+        c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+        return
+    }
+
+    _, err = database.DB.Exec("UPDATE targetKcal SET targetKcal = 1000 WHERE id = ?", id)
     if err != nil {
         log.Printf("Error resetting target calories: %v", err)
         c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
