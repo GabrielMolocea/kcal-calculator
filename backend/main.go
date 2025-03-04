@@ -23,6 +23,7 @@ func main() {
     router.POST("/newfood", postHandlers.PostFoods)
     router.POST("/targetkcal", postHandlers.PostTargetKcal)
     router.POST("/resttargetkcal", postHandlers.RestTargetKcal)
+    router.POST("/deductkcal", postHandlers.DeductKcal)
 
     router.Run("localhost:8080") // Change the port number here
 }

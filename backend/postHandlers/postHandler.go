@@ -45,6 +45,36 @@ func PostTargetKcal(c *gin.Context) {
     c.IndentedJSON(http.StatusCreated, targetKcal)
 }
 
+func DeductKcal (c * gin.Context) {
+    var food types.Food
+    var targetKcal types.TargetKcal
+
+    if err := c.BindJSON(&food); err != nil {
+        c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+        return
+    }
+
+    err := database.DB.QueryRow("SELECT id, targetKcal FROM targetKcal ORDER BY id DESC LIMIT 1").Scan(&targetKcal.ID, &targetKcal.TargetKcal)
+    if err != nil {
+        log.Panicf("Error selecting target calories: %v", err)
+        c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+        return
+    }
+
+    deductedTotal := targetKcal.TargetKcal - food.Calories
+
+    _, err  = database.DB.Exec("UPDATE targetKcal SET targetKcal = ? WHERE id = ?", deductedTotal, targetKcal.ID)
+    if err != nil {
+        log.Printf("Error deducting calories: %v", err)
+        c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+        return
+    }
+
+    c.IndentedJSON(http.StatusOK, gin.H{"message": "Target calories updated", "deductedTotal": deductedTotal})
+
+
+}
+
 func RestTargetKcal(c *gin.Context) {
     var id int
     err := database.DB.QueryRow("SELECT id FROM targetKcal ORDER BY id DESC LIMIT 1").Scan(&id)

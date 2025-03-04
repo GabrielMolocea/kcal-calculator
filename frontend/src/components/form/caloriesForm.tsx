@@ -3,10 +3,15 @@ import { Search, Plus } from "lucide-react";
 
 interface CaloriesFormProps {
 	setTotalKcal: (kcal: number) => void;
+	getTargetCalories: () => void;
 	foodList: { name: string; calories: number }[];
 }
 
-const CaloriesForm: React.FC<CaloriesFormProps> = ({ setTotalKcal, foodList }) => {
+const CaloriesForm: React.FC<CaloriesFormProps> = ({
+	setTotalKcal,
+	foodList,
+	getTargetCalories,
+}) => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selectedFood, setSelectedFood] = useState<{
 		name: string;
@@ -35,7 +40,9 @@ const CaloriesForm: React.FC<CaloriesFormProps> = ({ setTotalKcal, foodList }) =
 	);
 
 	const filteredFoods = foodList
-		.filter((food: { name: string; }) => food.name.toLowerCase().includes(searchTerm.toLowerCase()))
+		.filter((food: { name: string }) =>
+			food.name.toLowerCase().includes(searchTerm.toLowerCase())
+		)
 		.slice(0, 10);
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -43,7 +50,7 @@ const CaloriesForm: React.FC<CaloriesFormProps> = ({ setTotalKcal, foodList }) =
 		if (!selectedFood) return;
 
 		try {
-			await fetch("http://localhost:8080/newfood", {
+			await fetch("http://localhost:8080/deductkcal", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -54,6 +61,8 @@ const CaloriesForm: React.FC<CaloriesFormProps> = ({ setTotalKcal, foodList }) =
 			setSearchTerm("");
 		} catch (error) {
 			console.error("Failed to add food:", error);
+		} finally {
+			getTargetCalories();
 		}
 	};
 
@@ -143,7 +152,7 @@ const CaloriesForm: React.FC<CaloriesFormProps> = ({ setTotalKcal, foodList }) =
 							{isListVisible && searchTerm && (
 								<ul className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
 									{filteredFoods.length > 0 ? (
-										filteredFoods.map((food: { id?: any; name: any; calories: any; }) => (
+										filteredFoods.map((food: { id?: any; name: any; calories: any }) => (
 											<ul
 												key={food.id}
 												onClick={() => handleFoodSelect(food)}

@@ -47,7 +47,7 @@ function App() {
 			<div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
 				<h1 className="text-3xl font-bold mb-4">Calorie Calculator</h1>
 				<h2 className="text-xl mb-4">Target Calories: {targetCalories}</h2>
-				<CaloriesForm setTotalKcal={setTotalKcal} foodList={foodList} />
+				<CaloriesForm setTotalKcal={setTotalKcal} foodList={foodList} getTargetCalories={getTargetCalories} />
 				<h2 className="text-xl mt-4">
 					You have eaten this much calories today: {totalKcal}
 				</h2>
